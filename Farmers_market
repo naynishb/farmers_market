@@ -1,0 +1,78 @@
+-- Ques1. Get all the products available in the market
+select product_name,product_id
+FROM `jason-farmers-market-441508.farmers_market.product`
+
+
+-- fetch specific columns from product table, id, name and size
+select product_id,product_name,product_size
+from `jason-farmers-market-441508.farmers_market.product`
+
+--Explore vendor_booth_assignments. List down 10 rows of
+-- vendor_booth_assignments displaying the market_date, vendor ID, booth number.
+
+SELECT market_date,vendor_id,booth_number
+FROM `jason-farmers-market-441508.farmers_market.vendor_booth_assign`
+LIMIT 10
+
+
+----skip 2 records and display next 10 records
+SELECT *
+FROM `jason-farmers-market-441508.farmers_market.vendor_booth_assign`
+LIMIT 10 OFFSET 2
+
+-- Sort the VBA data by market_date, if market_date is same,sort the rows in descending order of vendor and limit the
+-- output to 20 rows
+
+SELECT *
+FROM `jason-farmers-market-441508.farmers_market.vendor_booth_assign`
+ORDER BY market_date ASC, vendor_id DESC
+LIMIT 20
+
+-- Ques 5 In the customer purchases, we have quantity and cost per qty
+-- separate, query the total amount that the customer has paid along with
+-- date, customer id, vendor_id, qty, cost per qty and the total amt.?
+
+SELECT market_date,customer_id,vendor_id,quantity,cost_to_customer_per_qty, round(quantity*cost_to_customer_per_qty,2) as total_amt
+FROM `jason-farmers-market-441508.farmers_market.customer_purchases`
+
+--- FILTERS AND SUBQUERIES
+
+-- We want to merge each customer’s name into a single column that contains the first name, then a space, and then the last name
+
+SELECT *,CONCAT(customer_first_name," ",customer_last_name) AS full_name
+FROM `jason-farmers-market-441508.farmers_market.customer`
+
+--Display the first name and first character of the last name
+
+SELECT *,CONCAT(customer_first_name," ",SUBSTR(customer_last_name, 1, 1)) AS full_name
+FROM `jason-farmers-market-441508.farmers_market.customer`
+
+
+-- Capitalise (first letter capitalise) the full_name of the customers
+SELECT UPPER(customer_first_name)
+FROM `jason-farmers-market-441508.farmers_market.customer`
+
+
+SELECT CONCAT(UPPER(SUBSTR(customer_first_name,1,1)),LOWER(SUBSTR(customer_first_name,2))," ",LOWER(customer_last_name)) AS FULL_NAME
+FROM `jason-farmers-market-441508.farmers_market.customer`
+
+SELECT *,CONCAT(INITCAP(customer_first_name)," ",LOWER(customer_last_name)) AS FULL_NAME
+FROM `jason-farmers-market-441508.farmers_market.customer`
+
+-- Filtering - Taking a subset of rows based on a condition
+-- Extract all the product names that belong to product category 1
+SELECT product_name
+FROM `jason-farmers-market-441508.farmers_market.product`
+WHERE product_category_id = 1
+
+--Print a report of everything the customer_id 4 has ever purchased at the market,and sort this data by date
+SELECT customer_id,product_id,market_date,quantity,cost_to_customer_per_qty,round(quantity*cost_to_customer_per_qty,2) as total_amount
+FROM `jason-farmers-market-441508.farmers_market.customer_purchases`
+WHERE customer_id = 4
+ORDER BY market_date ASC
+
+
+
+
+
+
