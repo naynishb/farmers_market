@@ -71,6 +71,135 @@ FROM `jason-farmers-market-441508.farmers_market.customer_purchases`
 WHERE customer_id = 4
 ORDER BY market_date ASC
 
+-- Get all the product info for products with product_id between 3 and 8 (not inclusive) or of product_id 10
+SELECT *
+FROM `jason-farmers-market-441508.farmers_market.product`
+WHERE product_id = 10 OR (product_id>3 and product_id<8)
+
+
+SELECT *
+FROM `jason-farmers-market-441508.farmers_market.product`
+WHERE product_id = 10 OR (product_id BETWEEN 4 AND 7)
+
+
+-- Find the booth assignments for vendor_id 7 for all the dates between April 3, 2019 and May 16, 2019, including the edge dates
+SELECT *
+FROM `jason-farmers-market-441508.farmers_market.vendor_booth_assign`
+WHERE vendor_id = 7 AND (market_date BETWEEN "2019-04-03" AND "2019-05-16")
+
+-- Return a list of customers with following last names - Diaz, Edwards, Wilson
+SELECT *
+FROM `jason-farmers-market-441508.farmers_market.customer`
+WHERE customer_last_name = "Diaz" OR customer_last_name = "Edwards" OR customer_last_name = "Wilson"
+
+SELECT *
+FROM `jason-farmers-market-441508.farmers_market.customer`
+WHERE customer_last_name IN ("Diaz","Edwards","Wilson")  
+
+-- Get all the product info for products with product_id between 3 and 8 (not inclusive) or of product_id 10
+SELECT *
+FROM `jason-farmers-market-441508.farmers_market.product`
+WHERE product_id in (4,5,6,7,10)
+
+--You want to get data about a customer you knew as Jerry but you are not sure if their name is Jeremy or Jeremiah or Jerry
+SELECT *
+FROM `jason-farmers-market-441508.farmers_market.customer`
+WHERE LOWER(customer_first_name) LIKE "jer%"
+
+-- 1. % - stands for 0 or more characters
+-- 2. _ (underscore) - stands for 1 and only 1 character
+
+-- Examples
+-- LIKE “a%” - any length string starting with “a”
+-- LIKE “%a” - anything length string with ends with “a”
+-- LIKE “%em%” - any string with “em” in between, will match “em” also
+-- LIKE “a_” - Any string with length 2 and starting from “a”
+-- LIKE “a_%” - A string with starts from “a” and at least is 2 character long
+
+-- Ques - Find all the products which don’t have sizes mentioned
+SELECT *
+FROM `jason-farmers-market-441508.farmers_market.product`
+WHERE product_size IS NULL OR TRIM(product_size) = ""
+
+-- SUBQUERIES
+
+-- Question: Analyze purchases made at the market on days when it rained.
+SELECT*
+FROM `jason-farmers-market-441508.farmers_market.customer_purchases`
+WHERE market_date IN (SELECT market_date
+FROM `jason-farmers-market-441508.farmers_market.market_date`
+WHERE market_rain_flag = 1)
+
+
+--  List down all the product details where product_category_name contains “Fresh” in it.
+SELECT *
+FROM `jason-farmers-market-441508.farmers_market.product_category`
+WHERE LOWER(product_category_name) LIKE "%fresh%"
+
+SELECT*
+FROM `jason-farmers-market-441508.farmers_market.product`
+WHERE product_category_id IN (SELECT product_category_id
+FROM `jason-farmers-market-441508.farmers_market.product_category`
+WHERE LOWER(product_category_name) LIKE "%fresh%")
+
+-- Find out which vendors primarily sell fresh products and which don’t.
+-- IF STATEMENT - check if condition is met IF(CONDITION, value if true, value if false) 
+SELECT *, IF(LOWER(vendor_type) LIKE "%fresh%","Yes","No") as is_fresh
+FROM `jason-farmers-market-441508.farmers_market.vendor`
+ORDER BY vendor_id
+
+-- : Put the total cost to customer purchases into bins of -
+-- ● under $5.00,
+-- ● $5.00–$9.99,
+-- ● $10.00–$19.99, or
+-- ● $20.00 and over.
+# CREATE A NEW COLUMN CALLED AS PRICE_BIN, 4 CATEGORIES
+
+SELECT*,ROUND(quantity*cost_to_customer_per_qty,2) AS PRICE,
+CASE
+  WHEN quantity*cost_to_customer_per_qty < 5
+  THEN "UNDER $5"
+  WHEN quantity*cost_to_customer_per_qty BETWEEN 5 AND 9.99
+  THEN "$5.00–$9.99"
+  WHEN quantity*cost_to_customer_per_qty BETWEEN 10 AND 19.99
+  THEN "$10.00–$19.99"
+  ELSE "Above $20"
+END AS PRICE_BIN
+FROM `jason-farmers-market-441508.farmers_market.customer_purchases`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
