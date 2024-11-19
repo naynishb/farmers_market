@@ -138,7 +138,7 @@ WHERE LOWER(product_category_name) LIKE "%fresh%"
 
 SELECT*
 FROM `jason-farmers-market-441508.farmers_market.product`
-WHERE product_category_id IN (SELECT product_category_id
+WHERE product_category_id IN (SELECT *
 FROM `jason-farmers-market-441508.farmers_market.product_category`
 WHERE LOWER(product_category_name) LIKE "%fresh%")
 
@@ -166,6 +166,32 @@ CASE
   ELSE "Above $20"
 END AS PRICE_BIN
 FROM `jason-farmers-market-441508.farmers_market.customer_purchases`
+
+-- List all the products along with their product category name
+SELECT PR.product_name,PC.product_category_name
+FROM `jason-farmers-market-441508.farmers_market.product` AS PR LEFT JOIN `jason-farmers-market-441508.farmers_market.product_category` AS PC
+ON PR.product_category_id = PC.product_category_id
+
+
+-- Get a list of customers' zip codes for customers who made a purchase on 2019-04-06.
+SELECT DISTINCT C.customer_zip
+FROM `jason-farmers-market-441508.farmers_market.customer` AS C INNER JOIN `jason-farmers-market-441508.farmers_market.customer_purchases` AS CP ON C.customer_id = CP.customer_id
+WHERE CP.market_date = "2019-04-06"
+
+-- Find out the customers who are either new to the market or have deleted their account from the market.
+SELECT *
+FROM `jason-farmers-market-441508.farmers_market.customer` AS C FULL OUTER JOIN `jason-farmers-market-441508.farmers_market.customer_purchases` AS CP
+ON C.customer_id = CP.customer_id
+WHERE C.customer_id IS NULL OR CP.customer_id IS NULL
+
+
+
+
+
+
+
+
+
 
 
 
