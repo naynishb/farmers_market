@@ -168,9 +168,18 @@ END AS PRICE_BIN
 FROM `jason-farmers-market-441508.farmers_market.customer_purchases`
 
 -- List all the products along with their product category name
-SELECT PR.product_name,PC.product_category_name
-FROM `jason-farmers-market-441508.farmers_market.product` AS PR LEFT JOIN `jason-farmers-market-441508.farmers_market.product_category` AS PC
+SELECT PR.*,PC.product_category_name
+FROM `jason-farmers-market-441508.farmers_market.product` AS PR FULL JOIN `jason-farmers-market-441508.farmers_market.product_category` AS PC
 ON PR.product_category_id = PC.product_category_id
+ORDER BY PC.product_category_id
+
+SELECT *
+FROM `jason-farmers-market-441508.farmers_market.product`
+ORDER BY product_category_id
+
+SELECT *
+FROM `jason-farmers-market-441508.farmers_market.product_category`
+
 
 
 -- Get a list of customers' zip codes for customers who made a purchase on 2019-04-06.
@@ -184,16 +193,46 @@ FROM `jason-farmers-market-441508.farmers_market.customer` AS C FULL OUTER JOIN 
 ON C.customer_id = CP.customer_id
 WHERE C.customer_id IS NULL OR CP.customer_id IS NULL
 
+-- Question: Get a list of the customers who made purchases on each market date.
+SELECT market_date,customer_id
+FROM `jason-farmers-market-441508.farmers_market.customer_purchases`
+GROUP BY market_date,customer_id
+ORDER BY market_date,customer_id
 
 
+-- Question: Count the number of purchases each customer made per market date.
+SELECT market_date,customer_id, transaction_time,COUNT(*) AS NUM_PURCHASES
+FROM `jason-farmers-market-441508.farmers_market.customer_purchases`
+GROUP BY market_date, customer_id,transaction_time
+ORDER BY market_date, customer_id
+
+-- Calculate the total quantity purchased by each customer per market_date. 
+SELECT market_date,customer_id,SUM(quantity) AS TOTAL_QTY
+FROM `jason-farmers-market-441508.farmers_market.customer_purchases`
+GROUP BY market_date, customer_id
+ORDER BY market_date, customer_id
+
+-- How many different kinds of products were purchased by each customer on each market date?
+SELECT market_date,customer_id,COUNT(DISTINCT product_id) AS DIFF_PRODUCTS
+FROM `jason-farmers-market-441508.farmers_market.customer_purchases`
+GROUP BY market_date, customer_id
+ORDER BY market_date, customer_id
 
 
+-- Question: Calculate the total price paid by customer_id 3 per market_date.
+SELECT market_date,ROUND(SUM(quantity*cost_to_customer_per_qty),2) AS TOTAL_SPENT
+FROM `jason-farmers-market-441508.farmers_market.customer_purchases`
+WHERE customer_id = 3
+GROUP BY market_date
+ORDER BY market_date
 
-
-
-
-
-
+-- Filter out vendors who brought at least 135 items from the farmer’s market over the period - 2019-05-02 and 2019-05-16
+SELECT vendor_id, SUM(quantity) AS item_count
+FROM `jason-farmers-market-441508.farmers_market.vendor_inventory`
+WHERE market_date BETWEEN "2019-05-08" AND "2019-05-18"
+GROUP BY vendor_id
+HAVING item_count >=135
+ORDER BY vendor_id
 
 
 
