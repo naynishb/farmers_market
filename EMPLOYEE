@@ -1,0 +1,49 @@
+SELECT EMP_ID.employeeNumber,EMP_ID.firstName AS TEAM_MEMBER,MAN_ID.firstName AS BOSS
+FROM `employee-data-442911.EMPLOYEE.EMPLOYEE2` EMP_ID LEFT JOIN `employee-data-442911.EMPLOYEE.EMPLOYEE2` MAN_ID
+ON EMP_ID.reportsTo = MAN_ID.employeeNumber
+ORDER BY EMP_ID.employeeNumber
+
+SELECT EMPLOYEE_ID.firstName, MANAGER_ID.firstName
+FROM `employee-data-442911.EMPLOYEE.EMPLOYEE2` AS EMPLOYEE_ID
+CROSS JOIN `employee-data-442911.EMPLOYEE.EMPLOYEE2` MANAGER_ID
+
+SELECT ROUND(AVG(REPORT_COUNT),0)
+FROM (SELECT COUNT(*) AS REPORT_COUNT
+FROM `employee-data-442911.EMPLOYEE.EMPLOYEE2`
+WHERE reportsTo IS NOT NULL
+GROUP BY reportsTo)
+
+SELECT jobTitle, COUNT(jobTitle)
+FROM `employee-data-442911.EMPLOYEE.EMPLOYEE2`
+GROUP BY jobTitle
+
+
+
+
+SELECT *
+FROM `employee-data-442911.EMPLOYEE.employee`
+
+SELECT *,CONCAT(firstName," ",lastName) AS FULL_NAME
+FROM `employee-data-442911.EMPLOYEE.employee`
+
+SELECT firstName, lastName,jobTitle
+FROM `employee-data-442911.EMPLOYEE.employee`
+WHERE officeCode = 1
+
+
+SELECT COUNT(*)
+FROM `employee-data-442911.EMPLOYEE.employee`
+
+SELECT EMP_ID.employeeNumber,EMP_ID.firstName,EMP_ID.lastName,MAN_ID.firstName,MAN_ID.lastName
+FROM `employee-data-442911.EMPLOYEE.employee` EMP_ID JOIN `employee-data-442911.EMPLOYEE.employee` MAN_ID
+ON EMP_ID.reportsTo = MAN_ID.employeeNumber
+WHERE EMP_ID.employeeNumber IS NOT 1002
+
+
+SELECT 
+  REPLACE(reportsTo,"NULL","")
+FROM `employee-data-442911.EMPLOYEE.employee` AS DATA_TABLE
+
+SELECT EMP_ID.employeeNumber,EMP_ID.firstName,EMP_ID.lastName,MAN_ID.firstName,MAN_ID.lastName
+FROM DATA_TABLE EMP_ID JOIN DATA_TABLE MAN_ID
+ON EMP_ID.reportsTo = MAN_ID.employeeNumber
