@@ -270,13 +270,36 @@ FROM `jason-farmers-market-441508.farmers_market.vendor_inventory`
 GROUP BY market_date,vendor_id
 ORDER BY market_date,vendor_id
 
+-- Q: Rank the products in each vendor’s inventory. Expensive products get a lower rank.
+SELECT *
+FROM (SELECT vendor_id,
+      market_date,
+      product_id,
+      original_price,
+      ROW_NUMBER() OVER (PARTITION BY vendor_id ORDER BY original_price DESC) AS PRICE_RANK
+FROM `jason-farmers-market-441508.farmers_market.vendor_inventory`
+ORDER BY vendor_id) X
+WHERE X.PRICE_RANK = 1
 
+SELECT *
+FROM (SELECT vendor_id,
+      market_date,
+      product_id,
+      original_price,
+      RANK() OVER (PARTITION BY vendor_id ORDER BY original_price DESC) AS PRICE_RANK
+FROM `jason-farmers-market-441508.farmers_market.vendor_inventory`
+ORDER BY vendor_id) Y
+WHERE Y.PRICE_RANK = 1
 
-
-
-
-
-
+SELECT *
+FROM (SELECT vendor_id,
+      market_date,
+      product_id,
+      original_price,
+      DENSE_RANK() OVER (PARTITION BY vendor_id ORDER BY original_price DESC) AS PRICE_RANK
+FROM `jason-farmers-market-441508.farmers_market.vendor_inventory`
+ORDER BY vendor_id) Y
+WHERE Y.PRICE_RANK = 1
 
 
 
