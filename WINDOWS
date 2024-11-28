@@ -1,0 +1,14 @@
+SELECT * FROM `employee-data-442911.Sales.sales_table` LIMIT 1000
+
+SELECT SUM(sale)
+FROM `employee-data-442911.Sales.sales_table`
+
+SELECT *,SUM(sale) OVER(PARTITION BY employee ORDER BY date) AS SUM_SALES
+FROM `employee-data-442911.Sales.sales_table`
+
+SELECT *,SUM(sale) OVER(PARTITION BY employee ORDER BY date RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS SUM_SALES
+FROM `employee-data-442911.Sales.sales_table`
+
+
+SELECT *,AVG(sale) OVER(PARTITION BY employee ORDER BY EXTRACT(MONTH FROM date) RANGE BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS SUM_SALES
+FROM `employee-data-442911.Sales.sales_table`
