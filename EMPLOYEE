@@ -47,3 +47,20 @@ FROM `employee-data-442911.EMPLOYEE.employee` AS DATA_TABLE
 SELECT EMP_ID.employeeNumber,EMP_ID.firstName,EMP_ID.lastName,MAN_ID.firstName,MAN_ID.lastName
 FROM DATA_TABLE EMP_ID JOIN DATA_TABLE MAN_ID
 ON EMP_ID.reportsTo = MAN_ID.employeeNumber
+
+
+SELECT * FROM `employee-data-442911.EMPLOYEE.EMPLOYEE_SALARY`
+
+-- Question: Find the employee with the second highest salary in each department.
+SELECT employee_name,department,salary,
+  NTH_VALUE(salary,2) OVER (PARTITION BY department ORDER BY salary DESC RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS SECOND_HIGH_SALARY
+FROM `employee-data-442911.EMPLOYEE.EMPLOYEE_SALARY`
+
+
+
+
+
+
+
+
+
