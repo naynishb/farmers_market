@@ -301,11 +301,26 @@ FROM `jason-farmers-market-441508.farmers_market.vendor_inventory`
 ORDER BY vendor_id) Y
 WHERE Y.PRICE_RANK = 1
 
+SELECT vendor_id,market_date,product_id,original_price,
+NTILE(10) OVER(ORDER BY market_date) AS TILE
+FROM `jason-farmers-market-441508.farmers_market.vendor_inventory`
+ORDER BY TILE,market_date
 
+SELECT *
+FROM `jason-farmers-market-441508.farmers_market.customer_purchases`
+WHERE product_id = 4 AND vendor_id = 7 AND market_date = "2019-04-03"
 
+-- Using the vendor_booth_assignments table in the Farmer’s
+-- Market database, display each vendor’s booth assignment for each
+-- market_date alongside their previous booth assignments.
 
-
-
+SELECT*
+FROM(SELECT market_date,
+      vendor_id,
+      booth_number,
+      LAG(booth_number,1) OVER (PARTITION BY vendor_id ORDER BY market_date) AS PREVIOS_BOOTH
+FROM `jason-farmers-market-441508.farmers_market.vendor_booth_assign`) Vi
+WHERE Vi.booth_number != Vi.PREVIOS_BOOTH
 
 
 
