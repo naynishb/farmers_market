@@ -324,6 +324,20 @@ WHERE Vi.booth_number != Vi.PREVIOS_BOOTH
 
 
 
+select market_start_datetime,
+extract(date from market_start_datetime) as date,
+extract(time from market_start_datetime) as time,
+extract(year from market_start_datetime) as year_no,
+extract(quarter from market_start_datetime) as q_no,
+extract(month from market_start_datetime) as month_no,
+extract(day from market_start_datetime) as day_no,
+extract(week from market_start_datetime) as week_no,
+extract(DAYOFWEEK from market_start_datetime) as week_day,
+extract(hour from market_start_datetime) as hr,
+extract(minute from market_start_datetime) as minute,
+extract(second from market_start_datetime) as second
+from farmers_market.datetime_demo
+
 
 
 
