@@ -360,5 +360,29 @@ ON
 c.market_date = m.market_date)
 
 
+SELECT * FROM `jason-farmers-market-441508.farmers_market.customer_purchases_date` LIMIT 1000
+
+-- Question: Let’s say you want to calculate how many sales occurred within the first 30 minutes after -- the farmer’s market opened, how would you dynamically determine what cutoff time to use? (automatically calculate it for every market date in your database)
+
+SELECT market_date,COUNT(*) AS NUM_SALES
+FROM `jason-farmers-market-441508.farmers_market.customer_purchases_date`
+WHERE market_date_transaction_time <= DATE_ADD(market_start_datetime,INTERVAL 30 MINUTE)
+GROUP BY market_date
+ORDER BY market_date
+
+-- Question: Find the number of days between the first and last market dates.
+SELECT X.FIRST_DAY,
+        X.LATEST_DAY,
+        DATE_DIFF(X.LATEST_DAY,X.FIRST_DAY,DAY)
+FROM (SELECT MIN(market_date) AS FIRST_DAY,
+      MAX(market_date) AS LATEST_DAY 
+FROM `jason-farmers-market-441508.farmers_market.customer_purchases_date`) X
+
+
+
+
+
+
+
 
 
