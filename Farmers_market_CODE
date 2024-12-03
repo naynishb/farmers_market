@@ -339,7 +339,25 @@ extract(second from market_start_datetime) as second
 from farmers_market.datetime_demo
 
 
-
+create table farmers_market.customer_purchases_date as
+(SELECT c.market_date,
+time(PARSE_DATETIME('%I:%M %P', m.market_start_time)) AS market_start_time,
+time(PARSE_DATETIME('%I:%M %P', m.market_end_time)) AS market_end_time,
+time(c.transaction_time) AS transaction_time, -- it was already in the time format, so no need to parse_datetime
+PARSE_DATETIME('%Y-%m-%d %I:%M %P', CONCAT(c.market_date, " ", m.market_start_time )) AS market_start_datetime,
+PARSE_DATETIME('%Y-%m-%d %I:%M %P', CONCAT(c.market_date, " ", m.market_end_time )) AS market_end_datetime,
+PARSE_DATETIME('%Y-%m-%d %H:%M:%S', CONCAT(c.market_date, " ", c.transaction_time )) AS market_date_transaction_time,
+c.product_id,
+c.vendor_id,
+c.customer_id,
+c.quantity,
+c.cost_to_customer_per_qty
+FROM
+farmers_market.customer_purchases c
+LEFT JOIN
+farmers_market.market_date_info m
+ON
+c.market_date = m.market_date)
 
 
 
