@@ -379,6 +379,39 @@ FROM (SELECT MIN(market_date) AS FIRST_DAY,
 FROM `jason-farmers-market-441508.farmers_market.customer_purchases_date`) X
 
 
+WITH sales_by_day_vendor AS
+ (SELECT
+ cp.market_date,
+ md.market_year, md.market_week, md.market_day,
+ cp.vendor_id,
+ v.vendor_name, v.vendor_type,
+ ROUND(SUM(cp.quantity * cp.cost_to_customer_per_qty),2) AS sales
+FROM `jason-farmers-market-441508.farmers_market.customer_purchases` AS cp
+LEFT JOIN `jason-farmers-market-441508.farmers_market.market_date` AS md
+ON cp.market_date = md.market_date
+LEFT JOIN `jason-farmers-market-441508.farmers_market.vendor` AS v
+ON cp.vendor_id = v.vendor_id
+GROUP BY
+ cp.market_date,
+ md.market_year, md.market_week, md.market_day,
+ cp.vendor_id,
+ v.vendor_name, v.vendor_type
+ORDER BY
+ cp.market_date,
+ md.market_year, md.market_week, md.market_day,
+ cp.vendor_id,
+ v.vendor_name, v.vendor_type
+)
+ SELECT
+ S.market_year, s.market_week,
+ SUM(s.sales) AS weekly_sales
+ FROM sales_by_day_vendor AS s
+GROUP BY s.market_year, s.market_week
+ORDER BY s.market_year DESC, s.market_week DESC
+
+
+
+
 
 
 
