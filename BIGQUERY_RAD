@@ -1,0 +1,260 @@
+--  Ques1. Get all the products available in the market
+
+SELECT *
+FROM `farmers-market-450513.farmers_market_jason_2.product`
+
+-- fetch specific columns from product table, id, name and size
+
+SELECT product_name,product_size
+FROM `farmers-market-450513.farmers_market_jason_2.product`
+
+--Explore vendor_booth_assignments. List down 10 rows of
+-- vendor_booth_assignments displaying the market_date, vendor ID, booth number.
+
+SELECT market_date,vendor_id,booth_number
+FROM `farmers-market-450513.farmers_market_jason_2.vendor_booth_assignments`
+LIMIT 15
+
+----skip 2 records and display next 10 records
+
+SELECT market_date,vendor_id,booth_number
+FROM `farmers-market-450513.farmers_market_jason_2.vendor_booth_assignments`
+LIMIT 10 offset 2
+
+-- Sort the VBA data by market_date, if market_date is same,sort the rows in descending order of vendor and limit the
+-- output to 20 rows
+
+SELECT *
+FROM `farmers-market-450513.farmers_market_jason_2.vendor_booth_assignments`
+ORDER BY market_date ASC,vendor_id DESC
+LIMIT 20
+
+-- Ques 5 In the customer purchases, we have quantity and cost per qty
+-- separate, query the total amount that the customer has paid along with
+-- date, customer id, vendor_id, qty, cost per qty and the total amt.?
+
+SELECT *,ROUND(quantity*cost_to_customer_per_qty,2) AS TOTAL_AMT
+FROM `farmers-market-450513.farmers_market_jason_2.customer_purchases`
+
+-- We want to merge each customer’s name into a single column that contains the first name, then a space, and then the last name
+
+SELECT *,CONCAT(customer_first_name," ",customer_last_name) AS FULL_NAME
+FROM `farmers-market-450513.farmers_market_jason_2.customer`
+
+--Display the first name and first character of the last name
+
+SELECT *,CONCAT(customer_first_name," ",SUBSTRING(customer_last_name,1,1)) AS FULL_NAME
+FROM `farmers-market-450513.farmers_market_jason_2.customer`
+
+
+-- Capitalise (first letter capitalise) the full_name of the customers
+
+SELECT *,UPPER(product_qty_type)
+FROM `farmers-market-450513.farmers_market_jason_2.product`
+
+SELECT *,lower(product_qty_type)
+FROM `farmers-market-450513.farmers_market_jason_2.product`
+
+SELECT *,INITCAP(product_qty_type)
+FROM `farmers-market-450513.farmers_market_jason_2.product`
+
+-- Extract all the product names that belong to product category 1
+
+SELECT *
+FROM `farmers-market-450513.farmers_market_jason_2.product`
+WHERE product_category_id = 1
+
+--Print a report of everything the customer_id 4 has ever purchased at the market,and sort this data by date
+
+SELECT *
+FROM `farmers-market-450513.farmers_market_jason_2.customer_purchases`
+WHERE customer_id = 4
+ORDER BY market_date ASC
+
+-- Get all the product info for products with product_id between 3 and 8 (not inclusive) or of product_id 10
+
+SELECT *
+FROM `farmers-market-450513.farmers_market_jason_2.product`
+WHERE product_id > 3 AND product_id < 8 OR product_id = 10
+
+
+SELECT *
+FROM `farmers-market-450513.farmers_market_jason_2.product`
+WHERE product_id BETWEEN 4 AND 7 OR product_id = 10
+
+-- Find the booth assignments for vendor_id 7 for all the dates between April 3, 2019 and May 16, 2019, including the edge dates
+
+SELECT *
+FROM `farmers-market-450513.farmers_market_jason_2.vendor_booth_assignments`
+WHERE vendor_id = 7 AND (market_date BETWEEN "2019-04-03" AND "2019-05-16")
+ORDER BY market_date
+
+-- Return a list of customers with following last names - Diaz, Edwards, Wilson
+
+SELECT *
+FROM `farmers-market-450513.farmers_market_jason_2.customer`
+WHERE customer_last_name IN ("Diaz","Edwards","Wilson")
+
+SELECT *
+FROM `farmers-market-450513.farmers_market_jason_2.product`
+WHERE product_id IN (4,5,6,7,10)
+
+--You want to get data about a customer you knew as Jerry but you are not sure if their name is Jeremy or Jeremiah or Jerry
+
+SELECT *
+FROM `farmers-market-450513.farmers_market_jason_2.customer`
+WHERE customer_first_name LIKE "J____%"
+
+-- 1. % - stands for 0 or more characters
+-- 2. _ (underscore) - stands for 1 and only 1 character
+
+-- Examples
+-- LIKE “a%” - any length string starting with “a”
+-- LIKE “%a” - anything length string with ends with “a”
+-- LIKE “%em%” - any string with “em” in between, will match “em” also
+-- LIKE “a_” - Any string with length 2 and starting from “a”
+-- LIKE “a_%” - A string with starts from “a” and at least is 2 character long
+
+-- Ques - Find all the products which don’t have sizes mentioned
+
+SELECT *
+FROM `farmers-market-450513.farmers_market_jason_2.product`
+WHERE product_size IS NULL OR TRIM(product_size) = ""
+
+-- Question: Analyze purchases made at the market on days when it rained.
+
+SELECT *
+FROM `farmers-market-450513.farmers_market_jason_2.customer_purchases`
+WHERE market_date IN (SELECT market_date
+FROM `farmers-market-450513.farmers_market_jason_2.market_date_info`
+WHERE market_rain_flag = 1)
+
+SELECT market_date
+FROM `farmers-market-450513.farmers_market_jason_2.market_date_info`
+WHERE market_rain_flag = 1
+
+--  List down all the product details where product_category_name contains “Fresh” in it.
+
+SELECT *
+FROM `farmers-market-450513.farmers_market_jason_2.product`
+WHERE product_category_id IN (SELECT product_category_id
+FROM `farmers-market-450513.farmers_market_jason_2.product_category`
+WHERE LOWER(product_category_name) LIKE "%fresh%")
+
+SELECT product_category_id
+FROM `farmers-market-450513.farmers_market_jason_2.product_category`
+WHERE LOWER(product_category_name) LIKE "%fresh%"
+
+-- Find out which vendors primarily sell fresh products and which don’t.
+
+SELECT *
+FROM `farmers-market-450513.farmers_market_jason_2.vendor`
+WHERE LOWER(vendor_type) LIKE "%fresh%"
+
+SELECT vendor_name,vendor_type,IF(LOWER(vendor_type) LIKE "%fresh%","YES","NO") AS TAGGING
+FROM `farmers-market-450513.farmers_market_jason_2.vendor`
+
+-- : Put the total cost to customer purchases into bins of -
+-- ● under $5.00,
+-- ● $5.00–$9.99,
+-- ● $10.00–$19.99, or
+-- ● $20.00 and over.
+# CREATE A NEW COLUMN CALLED AS PRICE_BIN, 4 CATEGORIES
+
+SELECT *,ROUND(quantity*cost_to_customer_per_qty,2) AS TOTAL_COST,
+CASE
+  WHEN quantity*cost_to_customer_per_qty < 5 THEN "under $5.00"
+  WHEN quantity*cost_to_customer_per_qty BETWEEN 5 AND 9.99 THEN "$5.00–$9.99"
+  WHEN quantity*cost_to_customer_per_qty BETWEEN 10 AND 19.99 THEN "$10.00–$19.99"
+  ELSE "$20.00 and over"
+END AS PRICE_BIN
+FROM `farmers-market-450513.farmers_market_jason_2.customer_purchases`
+
+-- List all the products along with their product category name
+
+SELECT P.product_name,PC.product_category_name
+FROM `farmers-market-450513.farmers_market_jason_2.product` AS P LEFT JOIN 
+`farmers-market-450513.farmers_market_jason_2.product_category` AS PC
+ON P.product_category_id = PC.product_category_id
+
+
+-- Get a list of customers' zip codes for customers who made a purchase on 2019-04-06.
+
+SELECT DISTINCT(customer_zip)
+FROM `farmers-market-450513.farmers_market_jason_2.customer` AS C INNER JOIN
+`farmers-market-450513.farmers_market_jason_2.customer_purchases` AS CP
+ON C.customer_id = CP.customer_id
+WHERE CP.market_date = "2019-04-06"
+
+SELECT *
+FROM `farmers-market-450513.farmers_market_jason_2.customer_purchases`
+
+
+-- Question: Get a list of the customers who made purchases on each market date.
+
+SELECT market_date,customer_id
+FROM `farmers-market-450513.farmers_market_jason_2.customer_purchases`
+GROUP BY market_date,customer_id
+ORDER BY market_date,customer_id
+
+-- Question: Count the number of purchases each customer made per market date.
+
+SELECT market_date,customer_id,count(*) as num_of_purchases
+FROM `farmers-market-450513.farmers_market_jason_2.customer_purchases`
+GROUP BY market_date,customer_id
+ORDER BY market_date,customer_id
+
+-- Calculate the total quantity purchased by each customer per market_date. 
+
+SELECT market_date,customer_id,sum(quantity) as quantity_purchased
+FROM `farmers-market-450513.farmers_market_jason_2.customer_purchases`
+GROUP BY market_date,customer_id
+ORDER BY market_date,customer_id
+
+-- Question: Calculate the total price paid by customer_id 3 per market_date.
+
+SELECT market_date,ROUND(SUM(quantity*cost_to_customer_per_qty),2) AS TOTAL_AMOUNT
+FROM `farmers-market-450513.farmers_market_jason_2.customer_purchases`
+WHERE customer_id = 3
+GROUP BY market_date
+ORDER BY market_date
+
+-- Filter out vendors who brought at least 135 items TO the farmer’s market over the period - 2019-05-08 and 2019-05-18
+
+SELECT vendor_id,SUM(quantity) NUMBER_IF_ITEMS
+FROM `farmers-market-450513.farmers_market_jason_2.vendor_inventory`
+WHERE market_date BETWEEN "2019-05-08" and "2019-05-18"
+GROUP BY vendor_id
+HAVING NUMBER_IF_ITEMS > 135
+
+-- Count how many different products each vendor brought to market on each date and display the count for each row. 
+
+SELECT *,COUNT(product_id) OVER (PARTITION BY market_date,vendor_id) AS VENDOR_PRODUCT_COUNT
+FROM `farmers-market-450513.farmers_market_jason_2.vendor_inventory`
+ORDER BY market_date,vendor_id
+
+-- Q: Rank the products in each vendor’s inventory. Expensive products get a lower rank.
+
+SELECT *,ROW_NUMBER() OVER (PARTITION BY vendor_id ORDER BY original_price DESC)
+FROM `farmers-market-450513.farmers_market_jason_2.vendor_inventory`
+
+
+SELECT *,RANK() OVER (PARTITION BY vendor_id ORDER BY original_price DESC)
+FROM `farmers-market-450513.farmers_market_jason_2.vendor_inventory`
+
+SELECT *,DENSE_RANK() OVER (PARTITION BY vendor_id ORDER BY original_price DESC)
+FROM `farmers-market-450513.farmers_market_jason_2.vendor_inventory`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
