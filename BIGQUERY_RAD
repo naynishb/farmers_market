@@ -246,15 +246,38 @@ SELECT *,DENSE_RANK() OVER (PARTITION BY vendor_id ORDER BY original_price DESC)
 FROM `farmers-market-450513.farmers_market_jason_2.vendor_inventory`
 
 
+-- Using the vendor_booth_assignments table in the Farmer’s
+-- Market database, display each vendor’s booth assignment for each
+-- market_date alongside their previous booth assignments.
+
+SELECT market_date,vendor_id,booth_number,LAG(booth_number,1) OVER (PARTITION BY vendor_id ORDER BY market_date) AS PREVIOS_DAY
+FROM `farmers-market-450513.farmers_market_jason_2.vendor_booth_assignments`
+
+
+SELECT market_date,EXTRACT(YEAR FROM MARKET_DATE),EXTRACT(MONTH FROM MARKET_DATE),EXTRACT(DAY FROM MARKET_DATE),FORMAT_DATE("%b",MARKET_DATE),FORMAT_DATE("%A",MARKET_DATE)
+FROM `farmers-market-450513.farmers_market_jason_2.market_date_info`
 
 
 
+WITH PRODUCT_CAT AS
+(SELECT *
+FROM `farmers-market-450513.farmers_market_jason_2.product` AS P LEFT JOIN 
+`farmers-market-450513.farmers_market_jason_2.product_category` AS PC
+ON P.product_category_id = PC.product_category_id)
+SELECT *
+FROM PRODUCT_CAT
+WHERE product_category_name LIKE "%Fresh%"
 
 
+SELECT *
+FROM PRODUCT_CAT
 
+CREATE VIEW `farmers-market-450513.farmers_market_jason_2.PRODUCT_CAT_1` AS
+SELECT P.*,PC.product_category_name
+FROM `farmers-market-450513.farmers_market_jason_2.product` AS P LEFT JOIN 
+`farmers-market-450513.farmers_market_jason_2.product_category` AS PC
+ON P.product_category_id = PC.product_category_id
 
-
-
-
-
+SELECT * FROM `farmers-market-450513.farmers_market_jason_2.PRODUCT_CAT_1`
+WHERE product_category_name LIKE "%Fresh%"
 
