@@ -301,8 +301,68 @@ SELECT market_date,vendor_id,booth_number,LAG(booth_number,1) OVER (PARTITION BY
 FROM `farmers_market.vendor_booth_assignments`
 ORDER BY vendor_id;
 
+SELECT market_date,market_start_datetime,FORMAT_DATE("%a",market_date) AS DAY_NAME,
+FORMAT_DATE("%B",market_date) AS MONTH_NAME,
+FORMAT_DATE("%r",market_start_datetime) AS TIME_12_HR
+FROM `farmers_market.date_time_demo`;
+
+SELECT market_date,EXTRACT(YEAR FROM MARKET_DATE) AS YEAR,EXTRACT(MONTH FROM MARKET_DATE) AS MONTH_NUMBER
+FROM `farmers_market.date_time_demo`;
+
+SELECT market_date,DATE_ADD(market_date, INTERVAL 1 YEAR)
+FROM `farmers_market.date_time_demo`;
+
+SELECT *,DATE_DIFF(X.AFTER_7_DAYS,X.market_date,YEAR) AS DURATION_IN_DAYS,CURRENT_DATE()
+FROM(SELECT market_date,DATE_ADD(market_date, INTERVAL 2 YEAR) AS AFTER_7_DAYS
+FROM `farmers_market.date_time_demo`) AS X
+
+SELECT market_date,CURRENT_DATE(),DATE_DIFF(CURRENT_DATE(),market_date,YEAR)
+FROM `farmers_market.date_time_demo`;
+
+-- Question: Let’s say you want to calculate how many sales occurred within the first 30 minutes after -- the farmer’s market opened, how would you dynamically determine what cutoff time to use? (automatically calculate it for every market date in your database)
 
 
+-- Calculate sales and top 10 customers based on revenue using view
 
+CREATE VIEW `farmers-market-5.farmers_market.SALES_BY_CUSTOMER` AS
+  SELECT C.*,CP.product_id,CP.market_date,CP.quantity,CP.cost_to_customer_per_qty,
+  ROUND(quantity * cost_to_customer_per_qty,2) AS AMOUNT
+  FROM `farmers_market.customer` AS C INNER JOIN `farmers_market.customer_purchases` AS CP
+  ON C.customer_id = CP.customer_id;
+
+SELECT customer_id,customer_first_name,customer_last_name,ROUND(SUM(AMOUNT),0) AS REVENUE
+FROM `farmers_market.SALES_BY_CUSTOMER`
+GROUP BY customer_id,customer_first_name,customer_last_name
+ORDER BY REVENUE DESC
+LIMIT 10;
+
+SELECT customer_id,customer_first_name,customer_last_name,COUNT(*) AS NUMBER_OF_TRANS
+FROM `farmers_market.SALES_BY_CUSTOMER`
+GROUP BY customer_id,customer_first_name,customer_last_name
+ORDER BY NUMBER_OF_TRANS DESC
+LIMIT 10;
+
+SELECT X.YEAR,SUM(AMOUNT) AS YEARLY_SALES
+FROM (SELECT *,EXTRACT(YEAR FROM MARKET_DATE) AS YEAR
+FROM `farmers_market.SALES_BY_CUSTOMER`) AS X
+GROUP BY X.YEAR;
+
+WITH SALES_BY_CUSTOMER_TEMPORARY AS
+  (SELECT C.*,CP.product_id,CP.market_date,CP.quantity,CP.cost_to_customer_per_qty,
+  ROUND(quantity * cost_to_customer_per_qty,2) AS AMOUNT
+  FROM `farmers_market.customer` AS C INNER JOIN `farmers_market.customer_purchases` AS CP
+  ON C.customer_id = CP.customer_id)
+  SELECT *
+  FROM SALES_BY_CUSTOMER_TEMPORARY;
+
+
+WITH SALES_BY_CUSTOMER_TEMPORARY AS
+  (SELECT C.*,CP.product_id,CP.market_date,CP.quantity,CP.cost_to_customer_per_qty,
+  ROUND(quantity * cost_to_customer_per_qty,2) AS AMOUNT
+  FROM `farmers_market.customer` AS C INNER JOIN `farmers_market.customer_purchases` AS CP
+  ON C.customer_id = CP.customer_id)
+  SELECT CUSTOMER_ID,SUM(AMOUNT)
+  FROM SALES_BY_CUSTOMER_TEMPORARY
+  GROUP BY CUSTOMER_ID;
 
 
