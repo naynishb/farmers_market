@@ -1,0 +1,129 @@
+-- Ques1. Get all the products available in the market
+
+SELECT *
+FROM `farmers_market.product`;
+
+-- fetch specific columns from product table, id, name and size
+
+SELECT product_id,product_name,product_size
+FROM `farmers_market.product`;
+
+--Explore vendor_booth_assignments. List down 10 rows of
+-- vendor_booth_assignments displaying the market_date, vendor ID, booth number.
+-- CTRL + ENTER 
+
+SELECT market_date,vendor_id,booth_number
+FROM `farmers_market.vendor_booth_assignments`
+LIMIT 10;
+
+----skip 2 records and display next 10 records
+
+SELECT market_date,vendor_id,booth_number
+FROM `farmers_market.vendor_booth_assignments`
+LIMIT 10 OFFSET 2;
+
+-- Sort the VBA data by market_date, if market_date is same,sort the rows in descending order of vendor and limit the
+-- output to 20 rows
+
+SELECT *
+FROM `farmers_market.vendor_booth_assignments`
+ORDER BY market_date ASC,vendor_id DESC
+LIMIT 20;
+
+-- Ques 5 In the customer purchases, we have quantity and cost per qty
+-- separate, query the total amount that the customer has paid along with
+-- date, customer id, vendor_id, qty, cost per qty and the total amt.?
+
+SELECT market_date,customer_id,vendor_id,quantity,cost_to_customer_per_qty,ROUND(quantity*cost_to_customer_per_qty,2) AS TOTAL_AMOUNT
+FROM `farmers_market.customer_purchases`;
+
+--- FILTERS AND SUBQUERIES
+
+-- We want to merge each customer’s name into a single column that contains the first name, then a space, and then the last name
+
+SELECT *,CONCAT(customer_first_name," ",customer_last_name) AS FULL_NAME
+FROM `farmers_market.customer`;
+
+--Display the first name and first character of the last name
+
+SELECT *,CONCAT(customer_first_name," ",SUBSTR(customer_last_name,1,1)) AS FULL_NAME
+FROM `farmers_market.customer`;
+
+SELECT *,CONCAT(customer_first_name," ",SUBSTR(customer_last_name,1,1))
+FROM `farmers_market.customer`;
+
+SELECT *,UPPER(customer_first_name),INITCAP(LOWER(customer_last_name))
+FROM `farmers_market.customer`;
+
+-- Filtering - Taking a subset of rows based on a condition
+-- Extract all the product names that belong to product category 1
+
+SELECT *
+FROM `farmers_market.product`
+WHERE product_category_id = 1;
+
+--Print a report of everything the customer_id 4 has ever purchased at the market,and sort this data by date
+
+SELECT *,ROUND(quantity*cost_to_customer_per_qty,2) AS TOTAL_AMT
+FROM `farmers_market.customer_purchases`
+WHERE customer_id = 4
+ORDER BY market_date;
+
+-- Get all the product info for products with product_id between 3 and 8 (not inclusive) or of product_id 10
+
+SELECT *
+FROM `farmers_market.product`
+WHERE product_id > 3 AND product_id < 8 OR product_id = 10;
+
+SELECT *
+FROM `farmers_market.product`
+WHERE product_id BETWEEN 4 AND 7 OR product_id = 10;
+
+
+-- Find the booth assignments for vendor_id 7 for all the dates between April 3, 2019 and May 16, 2019, including the edge dates
+
+SELECT *
+FROM `farmers_market.vendor_booth_assignments`
+WHERE vendor_id = 7 AND (market_date BETWEEN "2019-04-03" AND "2019-05-16");
+
+-- Return a list of customers with following last names - Diaz, Edwards, Wilson
+
+SELECT *
+FROM `farmers_market.customer`
+WHERE customer_last_name = "Diaz" OR customer_last_name = "Edwards" OR customer_last_name = "Wilson";
+
+SELECT *
+FROM `farmers_market.customer`
+WHERE LOWER(customer_last_name) IN ("diaz","edwards","wilson");
+
+-- Get all the product info for products with product_id between 3 and 8 (not inclusive) or of product_id 10
+
+SELECT *
+FROM `farmers_market.product`
+WHERE product_id IN (4,5,6,7,10);
+
+--You want to get data about a customer you knew as Jerry but you are not sure if their name is Jeremy or Jeremiah or Jerry
+
+SELECT *
+FROM `farmers_market.customer`
+WHERE LOWER(customer_first_name) LIKE "jer%";
+
+-- 1. % - stands for 0 or more characters
+-- 2. _ (underscore) - stands for 1 and only 1 character
+
+-- Examples
+-- LIKE “a%” - any length string starting with “a”
+-- LIKE “%a” - anything length string with ends with “a”
+-- LIKE “%em%” - any string with “em” in between, will match “em” also
+-- LIKE “a_” - Any string with length 2 and starting from “a”
+-- LIKE “a_%” - A string with starts from “a” and at least is 2 character long
+
+-- Ques - Find all the products which don’t have sizes mentioned
+
+SELECT *
+FROM `farmers_market.product`
+WHERE product_size IS NULL OR TRIM(product_size) = "";
+
+
+
+
