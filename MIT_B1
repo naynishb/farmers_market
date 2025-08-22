@@ -125,5 +125,50 @@ FROM `farmers_market.product`
 WHERE product_size IS NULL OR TRIM(product_size) = "";
 
 
+-- SUBQUERIES
 
+-- Question: Analyze purchases made at the market on days when it rained.
+
+SELECT *
+FROM `farmers_market.customer_purchases`
+WHERE market_date IN (SELECT market_date
+FROM `farmers_market.market_date_info`
+WHERE market_rain_flag = 1);
+
+SELECT market_date
+FROM `farmers_market.market_date_info`
+WHERE market_rain_flag = 1;
+
+--  List down all the product details where product_category_name contains “Fresh” in it.
+
+SELECT *
+FROM `farmers_market.product`
+where product_category_id IN (SELECT product_category_id
+FROM `farmers_market.product_category`
+WHERE LOWER(product_category_name) LIKE "%fresh%");
+
+SELECT product_category_id
+FROM `farmers_market.product_category`
+WHERE LOWER(product_category_name) LIKE "%fresh%";
+
+-- Find out which vendors primarily sell fresh products and which don’t.
+
+SELECT *,IF(LOWER(vendor_type) LIKE "%fresh%","Yes","No") AS FRESH_FLAG
+FROM `farmers_market.vendor`;
+
+-- : Put the total cost to customer purchases into bins of -
+-- ● under $5.00,
+-- ● $5.00–$9.99,
+-- ● $10.00–$19.99, or
+-- ● $20.00 and over.
+# CREATE A NEW COLUMN CALLED AS PRICE_BIN, 4 CATEGORIES
+
+SELECT *,ROUND(quantity*cost_to_customer_per_qty,2) AS TOTAL_AMOUNT,
+CASE
+  WHEN quantity*cost_to_customer_per_qty < 5 THEN "under $5.00"
+  WHEN quantity*cost_to_customer_per_qty BETWEEN 5 AND 9.99 THEN "5.00–$9.99"
+  WHEN quantity*cost_to_customer_per_qty BETWEEN 10 AND 19.99 THEN "$10.00–$19.99"
+  ELSE "$20.00 and over"
+END AS PRICE_BIN
+FROM `farmers_market.customer_purchases`;
 
