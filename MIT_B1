@@ -296,4 +296,15 @@ FROM (SELECT *,LAG(booth_number,1) OVER (PARTITION BY vendor_id ORDER BY market_
 FROM `farmers_market.vendor_booth_assignments`)
 WHERE booth_number <> PREVIOS_BOOTH;
 
+SELECT market_date,EXTRACT(DAY FROM MARKET_DATE),FORMAT_DATE("%A",MARKET_DATE)
+FROM `farmers_market.market_date_info`;
+
+SELECT market_date,date_add(market_date, INTERVAL 7 month),date_sub(market_date, INTERVAL 7 day)
+FROM `farmers_market.market_date_info`;
+
+select *,date_diff(added_7_months,market_date,day)
+from (SELECT market_date,date_add(market_date, INTERVAL 7 month) as added_7_months
+FROM `farmers_market.market_date_info`);
+
+
 
