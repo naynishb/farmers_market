@@ -306,5 +306,31 @@ select *,date_diff(added_7_months,market_date,day)
 from (SELECT market_date,date_add(market_date, INTERVAL 7 month) as added_7_months
 FROM `farmers_market.market_date_info`);
 
+CREATE VIEW `farmers-market-5.farmers_market.REVENUE_TABLE` AS
+SELECT CP.*,ROUND(CP.quantity*CP.cost_to_customer_per_qty,2) AS AMOUNT,CONCAT(C.customer_first_name," ",C.customer_last_name) AS F_NAME,P.product_name
+FROM `farmers_market.customer_purchases` AS CP LEFT JOIN `farmers_market.customer` AS C 
+ON CP.customer_id = C.customer_id LEFT JOIN `farmers_market.product` AS P
+ON CP.product_id = P.product_id;
 
+
+SELECT *
+FROM `farmers_market.REVENUE_TABLE`;
+
+WITH REVENEU_T2 AS
+(SELECT CP.*,ROUND(CP.quantity*CP.cost_to_customer_per_qty,2) AS AMOUNT,CONCAT(C.customer_first_name," ",C.customer_last_name) AS F_NAME,P.product_name
+FROM `farmers_market.customer_purchases` AS CP LEFT JOIN `farmers_market.customer` AS C 
+ON CP.customer_id = C.customer_id LEFT JOIN `farmers_market.product` AS P
+ON CP.product_id = P.product_id)
+SELECT *
+FROM REVENEU_T2;
+
+
+WITH REVENEU_T2 AS
+(SELECT CP.*,ROUND(CP.quantity*CP.cost_to_customer_per_qty,2) AS AMOUNT,CONCAT(C.customer_first_name," ",C.customer_last_name) AS F_NAME,P.product_name
+FROM `farmers_market.customer_purchases` AS CP LEFT JOIN `farmers_market.customer` AS C 
+ON CP.customer_id = C.customer_id LEFT JOIN `farmers_market.product` AS P
+ON CP.product_id = P.product_id)
+SELECT *
+FROM REVENEU_T2
+WHERE CUSTOMER_ID = 4;
 
