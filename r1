@@ -221,5 +221,51 @@ FROM `farmers_market.customer_purchases`
 WHERE customer_id = 3
 GROUP BY market_date;
 
+-- Filter out vendors who brought at least 135 items TO the farmer’s market over the period - 2019-05-08 and 2019-05-18
+
+SELECT vendor_id,SUM(quantity) AS TOTAL_ITEMS
+FROM `farmers_market.vendor_inventory`
+WHERE market_date BETWEEN "2019-05-08" AND "2019-05-18"
+GROUP BY vendor_id
+HAVING TOTAL_ITEMS > 135;
+
+-- : Find the average amount spent on each market day. We want to consider only those days
+-- where the number of purchases were more than 3 and every single transaction amount must be greater than 5.
+
+SELECT market_date,COUNT(*) AS NUMBER_OF_PURCHASES
+FROM `farmers_market.customer_purchases`
+WHERE quantity*cost_to_customer_per_qty > 5
+GROUP BY market_date
+HAVING NUMBER_OF_PURCHASES > 3;
+
+
+-- As a farmer, you want to figure out which of your products were above the average price on each market date?
+
+SELECT *
+FROM (SELECT *,AVG(original_price) OVER (PARTITION BY market_date) AS THAT_DAY_AVG
+FROM `farmers_market.vendor_inventory`)
+WHERE original_price > THAT_DAY_AVG;
+
+-- Question: Extract the farmer’s products with prices above the market date’s average product cost for vendor id 8?
+
+SELECT *
+FROM (SELECT *,AVG(original_price) OVER (PARTITION BY market_date) AS THAT_DAY_AVG
+FROM `farmers_market.vendor_inventory`)
+WHERE original_price > THAT_DAY_AVG AND VENDOR_ID = 8;
+
+-- Count how many different products each vendor brought to market on each date and display the count for each row. 
+
+SELECT *,COUNT(product_id) OVER (PARTITION BY market_date,vendor_id) AS VENDOR_PRODUCT_COUNT
+FROM `farmers_market.vendor_inventory`
+ORDER BY market_date,vendor_id;
+
+SELECT market_date,vendor_id,COUNT(product_id) AS VENDOR_PRODUCT_COUNT
+FROM `farmers_market.vendor_inventory`
+GROUP BY market_date,vendor_id
+ORDER BY market_date,vendor_id;
+
+
+
+
 
 
