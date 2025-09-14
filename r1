@@ -264,8 +264,57 @@ FROM `farmers_market.vendor_inventory`
 GROUP BY market_date,vendor_id
 ORDER BY market_date,vendor_id;
 
+-- Q: Rank the products in each vendor’s inventory. Expensive products get a lower rank.
 
+SELECT *
+FROM (SELECT *,ROW_NUMBER() OVER (PARTITION BY vendor_id ORDER BY original_price DESC) AS RANK_PRODUCTS
+FROM `farmers_market.vendor_inventory`)
+WHERE RANK_PRODUCTS=1;
 
+SELECT *,RANK() OVER (PARTITION BY vendor_id ORDER BY original_price DESC) AS RANK_PRODUCTS
+FROM `farmers_market.vendor_inventory`;
 
+SELECT *,DENSE_RANK() OVER (PARTITION BY vendor_id ORDER BY original_price DESC) AS RANK_PRODUCTS
+FROM `farmers_market.vendor_inventory`;
 
+SELECT *,NTILE(10) OVER (ORDER BY market_date) AS TILES
+FROM `farmers_market.vendor_inventory`;
+
+-- Using the vendor_booth_assignments table in the Farmer’s
+-- Market database, display each vendor’s booth assignment for each
+-- market_date alongside their previous booth assignments.
+
+SELECT *,LAG(booth_number,1) OVER (PARTITION BY vendor_id ORDER BY market_date) AS PREVIOS_BOOTH_NUMBER
+FROM `farmers_market.vendor_booth_assignments`;
+
+SELECT market_date,EXTRACT(MONTH FROM MARKET_DATE),FORMAT_DATE("%B",MARKET_DATE),FORMAT_DATE("%A",MARKET_DATE)
+FROM `farmers_market.date_time_demo`;
+
+-- MOST FREQUENTLY USED DATA
+CREATE VIEW `farmers_market.REVENUE_TABLE1` AS
+SELECT CP.*,C.customer_first_name,C.customer_last_name,P.product_name,P.product_category_id
+FROM `farmers_market.customer_purchases` AS CP LEFT JOIN `farmers_market.customer` AS C
+ON CP.customer_id = C.customer_id LEFT JOIN `farmers_market.product` AS P
+ON CP.product_id = P.product_id;
+
+SELECT *
+FROM `farmers_market.REVENUE_TABLE1`
+WHERE customer_id = 4;
+
+WITH REVENEU_TEMP AS
+(SELECT CP.*,C.customer_first_name,C.customer_last_name,P.product_name,P.product_category_id
+FROM `farmers_market.customer_purchases` AS CP LEFT JOIN `farmers_market.customer` AS C
+ON CP.customer_id = C.customer_id LEFT JOIN `farmers_market.product` AS P
+ON CP.product_id = P.product_id)
+SELECT *
+FROM REVENEU_TEMP;
+
+WITH REVENEU_TEMP AS
+(SELECT CP.*,C.customer_first_name,C.customer_last_name,P.product_name,P.product_category_id
+FROM `farmers_market.customer_purchases` AS CP LEFT JOIN `farmers_market.customer` AS C
+ON CP.customer_id = C.customer_id LEFT JOIN `farmers_market.product` AS P
+ON CP.product_id = P.product_id)
+SELECT *
+FROM REVENEU_TEMP
+WHERE CUSTOMER_ID = 4;
 
